@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.PersonMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.pojo.Person">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="idCard" property="idCard" />
+        <result column="provinceId" property="provinceId" />
+        <result column="gender" property="gender" />
+        <result column="age" property="age" />
+        <result column="birth" property="birth" />
+        <result column="weight" property="weight" />
+    </resultMap>
+
+    <resultMap id="PersonInfo" type="com.example.pojo.Person" extends="BaseResultMap">
+        <association property="province" javaType="com.example.pojo.Province">
+            <id column="pid" property="id" />
+            <result column="pname" property="name" />
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, idCard, provinceId, gender, age, birth, weight
+    </sql>
+
+    <!--获取所有员工（分页）-->
+    <select id="getPersonByPage" resultMap="PersonInfo">
+        select
+        per.*,
+        pro.id as pid,
+        pro.name as pname
+        from
+        t_person per,
+        t_province pro
+        where
+        per.provinceId = pro.id
+        <if test="person.name != null and person.name != ''">
+            and per.name like concat('%',#{person.name},'%')
+        </if>
+        order by per.id
+    </select>
+
+    <select id="getPerson" resultMap="PersonInfo">
+        select
+        per.*,
+        pro.id as pid,
+        pro.name as pname
+        from
+        t_person per,
+        t_province pro
+        where
+        per.provinceId = pro.id
+        <if test="id != null">
+            and per.id = #{id}
+        </if>
+        order by per.id
+    </select>
+</mapper>
